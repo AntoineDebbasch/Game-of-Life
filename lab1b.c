@@ -208,7 +208,7 @@ void menu()
 
 	for (int i = 2; i < cpt_fic; i++)printf("%d : %s\n", i - 1, tab[i]);
 
-	printf("\n\nWich file do you want to open : ");
+	printf("\n\nWich file do you want to open BLABLOU: ");
 	scanf("%d", &ch_menu);
 
 	printf("\nYou chosed file n%d : %s\n\n", ch_menu, tab[ch_menu + 1]);
