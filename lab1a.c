@@ -13,6 +13,9 @@
 #include <dirent.h>
 #include <string.h>
 
+
+//gcc lab1a.c lifegame.c -o output -g -Wall; ./output
+
 /* add whatever other includes here */
 
 /* number of generations to evolve the world */

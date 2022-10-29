@@ -13,82 +13,89 @@
 #include <dirent.h>
 #include <string.h>
 #include <termios.h>
-//#include "conio.h" 
 
-/* add whatever other includes here */
+// gcc lab1b.c lifegame.c -o output -g -Wall; ./output
 
 /* number of generations to evolve the world */
 #define NUM_GENERATIONS 10
 
-/* functions to implement -- can copy from Part A */
-
-/* this function should set the state of all
+/* this function set the state of all
    the cells in the next generation and call
    finalize_evolution() to update the current
    state of the world to the next generation */
 void next_generation(void);
 
-/* this function should return the state of the cell
+/* this function  return the state of the cell
    at (x,y) in the next generation, according to the
    rules of Conway's Game of Life (see handout) */
 int get_next_state(int x, int y);
 
-/* this function should calculate the number of alive
+/* this function calculate the number of alive
    neighbors of the cell at (x,y) */
 int num_neighbors(int x, int y);
 
-void menu();
-void dynamic_charge(char **tab,int  cpt_fic , int  nbchar);
-void get_info_txt(int * cpt_fic , int * nbchar);
+/* this function let the user chose the initial configuration
+ */
+void menu(int ch_menu);
+
+/* this function give the number of txt files and the number of char in total for the dynamic alloc
+ */
+void get_info_txt(int *cpt_fic, int *nbchar);
+
+/* this function is used like a scanf without the need to press enter
+ */
+int getch(void);
+
+/* this function let the user visualize the file he is about to open
+ */
+void visualize_file(const char *filename);
 
 int main(int argc, char **argv)
 {
 
-	/* TODO: initialize the world, from file argv[1]
-	   if command line argument provided (argc > 1), or
-	   using hard-coded pattern (use Part A) otherwise */
-
-	
-
-	int a = getch();
-	int fleche = 0;
-	int cpt = 0;
-	while(a != 10)
-	{
-		a = getch();
-		if(fleche == 1)
+	/*
+		int a = getch();
+		int fleche = 0;
+		int cpt = 0;
+		while(a != 10)
 		{
-			if(a==65) cpt++; // printf("Haut");
-			if(a==66) cpt--; //printf("Bas");
-			system("tput clear");
-			fleche = 0;
+			a = getch();
+			if(fleche == 1)
+			{
+				if(a==65) cpt++; // printf("Haut");
+				if(a==66) cpt--; //printf("Bas");
+				system("tput clear");
+				fleche = 0;
+			}
+
+			if(a == 91)
+			{
+				//printf("fleche\n");
+				fleche = 1;
+			}
+			else
+			{
+				//printf("%d\n",a);
+				fleche = 0;
+			}
+
+			//system("tput clear");
+			printf("%d  ",cpt);
+
+
+
 		}
 
-		if(a == 91)
-		{
-			//printf("fleche\n");
-			fleche = 1;
-		}
-		else
-		{
-			//printf("%d\n",a);
-			fleche = 0;
-		}
 
-		//system("tput clear");
-		printf("%d  ",cpt);
-			
+		return 0;*/
 
+	menu(3);
 
-	}
-		
-
-	return 0;
-	
-	menu();
+	printf("Generation n : 0\n");
+	print_world();
 	for (int n = 0; n < NUM_GENERATIONS; n++)
 	{
-		//system("tput clear");
+		// system("tput clear");
 
 		printf("Generation n : %d\n", n + 1);
 		next_generation();
@@ -100,7 +107,7 @@ int main(int argc, char **argv)
 	}
 
 	/* TODO: output final world state to console and save
-	   world to file "world.txt" in current directory */
+	   world to file "Final.txt" in current directory */
 
 	puts("Hello World !!");
 	save_world_to_file("./txt/Final.txt");
@@ -109,7 +116,7 @@ int main(int argc, char **argv)
 
 void next_generation(void)
 {
-	/* TODO: for every cell, set the state in the next
+	/* DONE: for every cell, set the state in the next
 	   generation according to the Game of Life rules
 
 	   Hint: use get_next_state(x,y) */
@@ -122,7 +129,7 @@ void next_generation(void)
 
 int get_next_state(int x, int y)
 {
-	/* TODO: for the specified cell, compute the state in
+	/* DONE: for the specified cell, compute the state in
 	   the next generation using the rules
 
 	   Use num_neighbors(x,y) to compute the number of live
@@ -148,7 +155,7 @@ int get_next_state(int x, int y)
 
 int num_neighbors(int x, int y)
 {
-	/* TODO: for the specified cell, return the number of
+	/* DONE: for the specified cell, return the number of
 	   neighbors that are ALIVE
 
 	   Use get_cell_state(x,y) */
@@ -171,23 +178,21 @@ int num_neighbors(int x, int y)
 
 	return cpt;
 }
-void menu()
+void menu(int ch_menu)
 {
 
-	int ch_menu;
+	system("tput clear");
 	int cpt_fic = 0;
 	int nbchar = 0;
 
 	char **tab;
 	char path[20] = "./txt/";
+	int key;
 
-	
+	get_info_txt(&cpt_fic, &nbchar);
 
-	get_info_txt(&cpt_fic,&nbchar);
-	//dynamic_charge(tab,cpt_fic,nbchar);
-	
 	struct dirent *dir;
- 	DIR *d2 = opendir("./txt");
+	DIR *d2 = opendir("./txt");
 
 	tab = (char **)malloc(cpt_fic * sizeof(char *) * nbchar);
 	cpt_fic = 0;
@@ -202,28 +207,49 @@ void menu()
 		}
 		closedir(d2);
 	}
-	
 
 	printf("Wich file do you want to open ?\n\n");
 
-	for (int i = 2; i < cpt_fic; i++)printf("%d : %s\n", i - 1, tab[i]);
+	for (int i = 2; i < cpt_fic; i++)
+	{
+		printf("%d : %s\n", i - 1, tab[i]);
+		if (ch_menu == i-1)
+		{
+			puts("------------------------------------------");
+			visualize_file(strcat(path, tab[i]));
+			puts("------------------------------------------");
+			strcpy(path, "./txt/");
+		}
+	}
 
-	printf("\n\nWich file do you want to open BLABLOU: ");
-	scanf("%d", &ch_menu);
+	printf("\n\nWich file do you want to open (Move with z and s): \n\n");
 
-	printf("\nYou chosed file n%d : %s\n\n", ch_menu, tab[ch_menu + 1]);
-	strcat(path, tab[ch_menu + 1]);
+    key = getch();
 
-	printf("The path is : %s\n", path);
-
-	initialize_world_from_file(path);
-
-	free(tab);
+	printf("key = %d\n",key);
+	usleep(100000);
+	
+	if(key == 10)
+	{
+		strcat(path, tab[ch_menu + 1]);
+		initialize_world_from_file(path);
+		free(tab);
+	}
+	else
+	{
+		if((key == 122 || key == 90) && ch_menu >= 2)
+			ch_menu--;
+			
+		if((key == 115 || key == 83) && ch_menu < cpt_fic-2)
+			ch_menu++;
+						
+		menu(ch_menu);
+	}
+		
+	
 }
 
-
-
-void get_info_txt(int * cpt_fic , int * nbchar)
+void get_info_txt(int *cpt_fic, int *nbchar)
 {
 	struct dirent *dir;
 	// opendir() renvoie un pointeur de type DIR.
@@ -239,20 +265,42 @@ void get_info_txt(int * cpt_fic , int * nbchar)
 	}
 }
 
-void dynamic_charge(char **tab,int  cpt_fic , int  nbchar)
-{
-
-}
-
 int getch(void)
 {
-    struct termios oldattr, newattr;
-    int ch;
-    tcgetattr( STDIN_FILENO, &oldattr );
-    newattr = oldattr;
-    newattr.c_lflag &= ~( ICANON | ECHO );
-    tcsetattr( STDIN_FILENO, TCSANOW, &newattr );
-    ch = getchar();
-    tcsetattr( STDIN_FILENO, TCSANOW, &oldattr );
-    return ch;
+	struct termios oldattr, newattr;
+	int ch;
+	tcgetattr(STDIN_FILENO, &oldattr);
+	newattr = oldattr;
+	newattr.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
+	ch = getchar();
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
+	return ch;
+}
+
+void visualize_file(const char *filename)
+{
+	FILE *ptr = fopen(filename, "r");
+	char ch;
+
+	if (NULL == ptr)
+	{
+		printf("file can't be opened \n");
+	}
+
+	do
+	{
+		ch = fgetc(ptr);
+		if (ch == '\n')
+			puts(" ");
+
+		else if (ch == '*')
+			printf("%c", '*');
+		else if (ch == ' ')
+			printf("%c", ' ');
+
+	} while (ch != EOF);
+
+	fclose(ptr);
+	puts(" ");
 }
