@@ -13,10 +13,10 @@
 #include <dirent.h>
 #include <string.h>
 
+//#define DEBUG
 
 //gcc lab1a.c lifegame.c -o output -g -Wall; ./output
 
-/* add whatever other includes here */
 
 /* number of generations to evolve the world */
 #define NUM_GENERATIONS 50
@@ -41,27 +41,27 @@ int num_neighbors(int x, int y);
 int main(void)
 {
 
-	/* TODO: initialize the world */
+	/* DONE: initialize the world */
 	
 	initialize_world();
 	print_world();
 
 	for (int n = 0; n < NUM_GENERATIONS; n++)
 	{
-
-		//system("tput clear");
-
-		printf("Generation n : %d\n", n + 1);
-		next_generation();
-		print_world();
-		usleep(300000);
+		#ifdef DEBUG
+		system("tput clear");
+		#endif
+		printf("Generation n : %d\n", n + 1);  	// we print the generation number
+		next_generation(); 						// we calculate the next generation 
+		print_world();							// we print the world
+		usleep(300000);							//		
 
 		if (is_World_Empty())
 			n = NUM_GENERATIONS;
 	}
 
-	/* TODO: output final world state */
-
+	/* DONE: output final world state */
+	print_world();
 	puts("Hello World !!");
 
 	return 0;
@@ -69,7 +69,7 @@ int main(void)
 
 void next_generation(void)
 {
-	/* TODO: for every cell, set the state in the next
+	/* DONE: for every cell, set the state in the next
 	   generation according to the Game of Life rules
 
 	   Hint: use get_next_state(x,y) and set_next_state(x,y) */
@@ -83,7 +83,7 @@ void next_generation(void)
 
 int get_next_state(int x, int y)
 {
-	/* TODO: for the specified cell, compute the state in
+	/* DONE: for the specified cell, compute the state in
 	   the next generation using the rules
 
 	   Use num_neighbors(x,y) to compute the number of live
@@ -109,6 +109,9 @@ int get_next_state(int x, int y)
 
 int num_neighbors(int x, int y)
 {
+	/* DONE: for the specified cell, return the number of
+	   neighbors that are ALIVE */
+
 	int cpt = 0;
 
 	for (int dx = -1; dx <= 1; dx++)

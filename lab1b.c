@@ -13,9 +13,9 @@
 #include <dirent.h>
 #include <string.h>
 #include <termios.h>
+//#include <windows.h>
 
-
-#define DEBUG
+//#define DEBUG
 
 // gcc lab1b.c lifegame.c -o output -g -Wall; ./output
 
@@ -54,8 +54,11 @@ int getch(void);
 void visualize_file(const char *filename);
 
 /*this function process and displays the simulation of the n generation
-*/
+ */
 void simulation();
+
+
+
 
 int main(int argc, char **argv)
 {
@@ -136,9 +139,9 @@ int num_neighbors(int x, int y)
 }
 void menu(int ch_menu)
 {
-	#ifndef DEBUG
-		system("tput clear");
-	#endif
+#ifndef DEBUG
+	system("tput clear");
+#endif
 	int cpt_fic = 0;
 	int nbchar = 0;
 
@@ -179,14 +182,8 @@ void menu(int ch_menu)
 		}
 	}
 
-	
-	for(int i = 0 ; i < 200 ; i++)
-{
-	putchar(i);
-	printf("%d - %c\n",i,i);
-}	
 	printf("\n\nWich file do you want to open (Move with up arrow and down arrow then press enter): \n\n");
-	
+
 	key = getch();
 
 	if (key == 10)
@@ -258,9 +255,16 @@ void visualize_file(const char *filename)
 			puts(" ");
 
 		else if (ch == '*')
+		{
+			Blue();
 			printf("%c", '*');
+		}
+			
 		else if (ch == ' ')
 			printf("%c", ' ');
+		
+		White();
+			
 
 	} while (ch != EOF);
 
@@ -275,10 +279,10 @@ void simulation()
 
 	for (int n = 0; n < NUM_GENERATIONS; n++)
 	{
-		#ifndef DEBUG
-			system("tput clear");
-		#endif
-		
+#ifndef DEBUG
+		system("tput clear");
+#endif
+
 		printf("Generation n : %d\n", n + 1);
 		next_generation();
 		print_world();
@@ -293,3 +297,17 @@ void simulation()
 
 	save_world_to_file("./txt/Final.txt");
 }
+
+
+
+
+
+/* Colors
+Black \033[0;30m
+Red \033[0;31m
+Green \033[0;32m
+Yellow \033[0;33m
+Blue \033[0;34m
+Purple \033[0;35m
+Cyan \033[0;36m
+White \033[0;37m*/

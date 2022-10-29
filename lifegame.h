@@ -52,4 +52,14 @@ void save_world_to_file(const char * filename);
 
 void print_world(void);
 
+
+void Black();
+void Red();
+void Green();
+void Yellow();
+void Blue();
+void Purple();
+void Cyan();
+void White();
+
 #endif /* LIFEGAME_H_ */

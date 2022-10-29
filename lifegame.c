@@ -1,8 +1,8 @@
 /*
  * lifegame.c
  *
- *  Created on:
- *      Author:
+ *  Created on: 04/10/2022
+ *      Author: Antoine DEBBASCH
  */
 
 #include <stdio.h>
@@ -18,18 +18,21 @@
 
 /* character representations of cell states */
 #define CHAR_ALIVE '*'
-#define CHAR_DEAD  ' '
+#define CHAR_DEAD ' '
 
-/* current cell states of the world */
+/* current cell states of the world 
+*/
 static int world[WORLDWIDTH][WORLDHEIGHT];
 
-/* next generation cell states */
+/* next generation cell states 
+*/
 static int nextstates[WORLDWIDTH][WORLDHEIGHT];
 
-/* functions to write for Part B of lab */
+/* functions to write for Part B of lab
+ */
 void initialize_world_from_file(const char *filename)
 {
-	/* TODO: read the state of the world from a file with
+	/* DONE: read the state of the world from a file with
 	   name "filename". Assume file exists, is readable, and
 	   the ith character of the jth line (zero-indexed) describes
 	   world[i][j] according to the characters CHAR_ALIVE and
@@ -45,48 +48,48 @@ void initialize_world_from_file(const char *filename)
 
 	   Also need to reset the next generation to DEAD
 	 */
+
+	// for all the cells
 	for (int x = 0; x < WORLDWIDTH; x++)
 		for (int y = 0; y < WORLDHEIGHT; y++)
-			world[x][y] = DEAD;
+			world[x][y] = DEAD; // define dead at the beginning
 
-	 FILE* ptr = fopen(filename, "r");
-	 char ch;
-	 int x = 0 , y = 0;
+	FILE *ptr = fopen(filename, "r"); // we open the file
+	char ch;
+	int x = 0, y = 0;
 
-	 if (NULL == ptr) {
-        printf("file can't be opened \n");
-    }
- 
-    printf("content of this file are \n");
-
-	 do {
-        ch = fgetc(ptr);
-		if(ch == '\n' && y < WORLDHEIGHT)
+	if (NULL == ptr)					   	// if the file can't be opned
+		printf("file can't be opened \n"); 	// infrom the user
+	else								 	// else
+		do
 		{
-			y++;
-			x=0;
-		}
-			
-		else if(ch == CHAR_ALIVE)
-			world[x][y] = ALIVE;
+			ch = fgetc(ptr);						// we get all the char from the file one by one 
+			if (ch == '\n' && y < WORLDHEIGHT)		// if it is the end of the line and it isn't bigger than the world
+			{	
+				y++;								// go to next line
+				x = 0;								// return at the begining of the libe
+			}
 
-			
-		else if(ch == CHAR_DEAD)
-			world[x][y] = DEAD;
-		
-		if(x < WORLDWIDTH)
-			x++;
-    
- 
-        // Checking if character is not EOF.
-        // If it is EOF stop eading.
-    } while (ch != EOF);
-	fclose(ptr);
+			else if (ch == CHAR_ALIVE)				// if it isn't the end of the line if it is the char alive
+				world[x][y] = ALIVE;				// we set the cell alive
+
+			else if (ch == CHAR_DEAD)				// if it is the char dead
+				world[x][y] = DEAD;					// we set the cell dead
+
+			if (x < WORLDWIDTH)						// if we are not exeeding the width of the world
+				x++;								// we pass to the next cell
+
+													// Checking if character is not EOF.
+													// If it is EOF stop eading.
+		} while (ch != EOF);
+	fclose(ptr);									// close the file
 }
 
+/* this function save the world to a file
+*/
 void save_world_to_file(const char *filename)
 {
-	/* TODO: write the state of the world into a file with
+	/* DONE: write the state of the world into a file with
 	   name "filename". Assume the file can be created, or if
 	   the file exists, overwrite the file. The ith character
 	   of the jth line (zero-indexed) describes world[i][j]
@@ -97,95 +100,97 @@ void save_world_to_file(const char *filename)
 	   it to resume a game later
 	 */
 
-	FILE *  fic = NULL;
-	fic = fopen (filename,"w");
+	FILE *fic = NULL;
+	fic = fopen(filename, "w");						// we open the file in a writable way
 	int state;
 
-	if (fic==NULL)
-   { 
-	printf("Erreur d’ouverture de fichier\n" );}
-	else
-   { 
-	for (int y = 0; y < WORLDHEIGHT; y++)
-	{
-		for (int x = 0; x < WORLDWIDTH; x++)	
-		{
-			state = get_cell_state(x,y);
-			if( state == ALIVE)
-			{
-				fprintf(fic,"*");
-			}
-
-			else
-				fprintf(fic," ");
-			
+	if (fic == NULL)								// if the file isn't open	
+	{		
+		printf("Erreur d’ouverture de fichier\n");	// we inform the user
 		}
-		fprintf(fic,"\n");
+	else											// else
+	{												// for all the cells
+		for (int y = 0; y < WORLDHEIGHT; y++)
+		{
+			for (int x = 0; x < WORLDWIDTH; x++)
+			{
+				state = get_cell_state(x, y);		// we get the sate of the cell
+				if (state == ALIVE)					// if the cell is alive
+				{
+					fprintf(fic, "*");				// write in the file that it is alive
+				}
+
+				else								// else
+					fprintf(fic, " ");				// print that it is dead
+			}
+			fprintf(fic, "\n");
+		}
+
+		fclose(fic);								// then close the file
 	}
-		
-	fclose(fic);
-   }
 }
 
-/* you shouldn't need to edit anything below this line */
+
 
 /* initializes the world to a hard-coded pattern, and resets
    all the cells in the next generation to DEAD */
-void initialize_world(void) // world[collone][ligne] = ALIVE;
+void initialize_world(void) // world[collone][ligne]
 {
 	int i, j;
-
+													// for all the cell
 	for (i = 0; i < WORLDWIDTH; i++)
 		for (j = 0; j < WORLDHEIGHT; j++)
-			world[i][j] = nextstates[i][j] = DEAD;
+			world[i][j] = nextstates[i][j] = DEAD;	// set it to dead 
 
 	/* pattern "glider"*/
-	world[1][2] = ALIVE;
+	world[1][2] = ALIVE;							// Draw the glider patern cell by cell
 	world[3][1] = ALIVE;
 	world[3][2] = ALIVE;
 	world[3][3] = ALIVE;
-	world[2][3] = ALIVE; 
+	world[2][3] = ALIVE;
 
 	/*
 	 |       *
-     |     * * 
-     |      **
+	 |     * *
+	 |      **
 	*/
-
-
-	/*
-	world[1][3] = ALIVE;
-	world[2][3] = ALIVE;
-	world[3][3] = ALIVE;*/
 }
 
-int is_World_Empty(void)
-{
+/* Tets if the world is empty or not
+*/
+int is_World_Empty(void) 
+{												// for all the cells 
 	for (int i = 0; i < WORLDWIDTH; i++)
 		for (int j = 0; j < WORLDHEIGHT; j++)
-			if (world[i][j] == ALIVE)
-				return 0;
-	return 1;
+			if (world[i][j] == ALIVE)			// if at least one is alive 
+				return 0;						// then the world isn't empty
+	return 1;									// else it is empty
 }
 
-int get_world_width(void)
+/*Get the width of the worl
+*/
+int get_world_width(void) 
 {
 	return WORLDWIDTH;
 }
 
-int get_world_height(void)
+/*Get the height of the world
+*/
+int get_world_height(void) 
 {
 	return WORLDHEIGHT;
 }
 
-int get_cell_state(int x, int y)
+/*Get the state of the cell
+*/
+int get_cell_state(int x, int y) 
 {
-	if (x < 0 || x >= WORLDWIDTH || y < 0 || y >= WORLDHEIGHT)
-		return DEAD;
-	return world[x][y];
+	if (x < 0 || x >= WORLDWIDTH || y < 0 || y >= WORLDHEIGHT) 	// if the coordinate are not defined in the wordl 
+		return DEAD;											// return that irt is dead
+	return world[x][y];											// else return its state
 }
 
-void set_cell_state(int x, int y, int state)
+void set_cell_state(int x, int y, int state) // Set the state of the cell
 {
 	if (x < 0 || x >= WORLDWIDTH || y < 0 || y >= WORLDHEIGHT)
 	{
@@ -195,7 +200,7 @@ void set_cell_state(int x, int y, int state)
 	nextstates[x][y] = state;
 }
 
-void finalize_evolution(void)
+void finalize_evolution(void) // Finalize evolution for next generation
 {
 	for (int x = 0; x < WORLDWIDTH; x++)
 		for (int y = 0; y < WORLDHEIGHT; y++)
@@ -205,7 +210,7 @@ void finalize_evolution(void)
 		}
 }
 
-void output_world(void)
+void output_world(void) // Function given to display the world
 {
 	char worldstr[2 * WORLDWIDTH + 2];
 	int i, j;
@@ -231,36 +236,42 @@ void output_world(void)
 	puts(worldstr);
 }
 //---------------------------------//
-void print_world(void)
+void print_world(void) // Function made to display the world
 {
-	/*
-	printf("%c",201);
-	for(int i = 1 ; i < WORLDWIDTH+1 ; i ++)
-		printf("%c",205);
-	printf("%c",205);*/
 
-	
-	for(int i = 0 ; i < WORLDWIDTH+2 ; i ++)
-		printf("-");
+	for (int i = 0; i < WORLDWIDTH + 2; i++) printf("-");		// draw the top line of the frame
 
 	printf("\n");
 
-	for(int i = 0 ; i < WORLDHEIGHT ; i ++)
+	for (int i = 0; i < WORLDHEIGHT; i++)						// for all the lines
 	{
-		printf("|");
-		for(int j = 0 ; j < WORLDWIDTH ; j ++)
+		printf("|");											// draw the left side of the frame
+		for (int j = 0; j < WORLDWIDTH; j++)					// for all the cells in this line
+		{
+			if (world[j][i] == ALIVE)							// if the cell is alive
 			{
-				if(world[j][i] == ALIVE)
-					printf("*");
-				else
-					printf(" ");
+				Yellow();										// set the color to yellow
+				printf("*");									// draw a *
 			}
-		printf("|\n");
+			else
+			{
+				Red();											// set the color to red
+				printf("-");									// draw a -
+			}	
+			White();
+		}
+		printf("|\n");											// draw the right part of the frame
 	}
 
-	
-	for(int i = 0 ; i < WORLDWIDTH+2 ; i ++)
-		printf("-");
-	
+	for (int i = 0; i < WORLDWIDTH + 2; i++) printf("-"); 		// draw the bottom line of the frame
+
 	printf("\n");
 }
+/* Set the color to Black	*/void Black() 	{ printf("\033[0;30m");}
+/* Set the color to Red  	*/void Red() 	{ printf("\033[1;31m");}
+/* Set the color to Green	*/void Green() 	{ printf("\033[0;32m");}
+/* Set the color to Yellow	*/void Yellow() { printf("\033[0;33m");}
+/* Set the color to Blue	*/void Blue() 	{ printf("\033[0;34m");}
+/* Set the color to Purple	*/void Purple() { printf("\033[0;35m");}
+/* Set the color to Cyan	*/void Cyan() 	{ printf("\033[0;36m");}
+/* Set the color to White	*/void White() 	{ printf("\033[0;37m");}
