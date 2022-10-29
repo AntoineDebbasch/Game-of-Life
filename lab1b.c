@@ -14,10 +14,13 @@
 #include <string.h>
 #include <termios.h>
 
+
+#define DEBUG
+
 // gcc lab1b.c lifegame.c -o output -g -Wall; ./output
 
 /* number of generations to evolve the world */
-#define NUM_GENERATIONS 10
+int NUM_GENERATIONS = 10;
 
 /* this function set the state of all
    the cells in the next generation and call
@@ -50,67 +53,20 @@ int getch(void);
  */
 void visualize_file(const char *filename);
 
+/*this function process and displays the simulation of the n generation
+*/
+void simulation();
+
 int main(int argc, char **argv)
 {
 
-	/*
-		int a = getch();
-		int fleche = 0;
-		int cpt = 0;
-		while(a != 10)
-		{
-			a = getch();
-			if(fleche == 1)
-			{
-				if(a==65) cpt++; // printf("Haut");
-				if(a==66) cpt--; //printf("Bas");
-				system("tput clear");
-				fleche = 0;
-			}
+	menu(1);
+	printf("How many generation do you want : ");
+	scanf("%d", &NUM_GENERATIONS);
 
-			if(a == 91)
-			{
-				//printf("fleche\n");
-				fleche = 1;
-			}
-			else
-			{
-				//printf("%d\n",a);
-				fleche = 0;
-			}
-
-			//system("tput clear");
-			printf("%d  ",cpt);
-
-
-
-		}
-
-
-		return 0;*/
-
-	menu(3);
-
-	printf("Generation n : 0\n");
-	print_world();
-	for (int n = 0; n < NUM_GENERATIONS; n++)
-	{
-		// system("tput clear");
-
-		printf("Generation n : %d\n", n + 1);
-		next_generation();
-		print_world();
-		usleep(300000);
-
-		if (is_World_Empty())
-			n = NUM_GENERATIONS;
-	}
-
-	/* TODO: output final world state to console and save
-	   world to file "Final.txt" in current directory */
+	simulation();
 
 	puts("Hello World !!");
-	save_world_to_file("./txt/Final.txt");
 	return 0;
 }
 
@@ -180,8 +136,9 @@ int num_neighbors(int x, int y)
 }
 void menu(int ch_menu)
 {
-
-	system("tput clear");
+	#ifndef DEBUG
+		system("tput clear");
+	#endif
 	int cpt_fic = 0;
 	int nbchar = 0;
 
@@ -213,7 +170,7 @@ void menu(int ch_menu)
 	for (int i = 2; i < cpt_fic; i++)
 	{
 		printf("%d : %s\n", i - 1, tab[i]);
-		if (ch_menu == i-1)
+		if (ch_menu == i - 1)
 		{
 			puts("------------------------------------------");
 			visualize_file(strcat(path, tab[i]));
@@ -222,14 +179,17 @@ void menu(int ch_menu)
 		}
 	}
 
-	printf("\n\nWich file do you want to open (Move with z and s): \n\n");
-
-    key = getch();
-
-	printf("key = %d\n",key);
-	usleep(100000);
 	
-	if(key == 10)
+	for(int i = 0 ; i < 200 ; i++)
+{
+	putchar(i);
+	printf("%d - %c\n",i,i);
+}	
+	printf("\n\nWich file do you want to open (Move with up arrow and down arrow then press enter): \n\n");
+	
+	key = getch();
+
+	if (key == 10)
 	{
 		strcat(path, tab[ch_menu + 1]);
 		initialize_world_from_file(path);
@@ -237,22 +197,25 @@ void menu(int ch_menu)
 	}
 	else
 	{
-		if((key == 122 || key == 90) && ch_menu >= 2)
-			ch_menu--;
-			
-		if((key == 115 || key == 83) && ch_menu < cpt_fic-2)
-			ch_menu++;
-						
+		if (key == 27)
+		{
+			key = getch();
+			if (key == 91)
+			{
+				key = getch();
+				if (key == 65 && ch_menu >= 2)
+					ch_menu--;
+				if (key == 66 && ch_menu < cpt_fic - 2)
+					ch_menu++;
+			}
+		}
 		menu(ch_menu);
 	}
-		
-	
 }
 
 void get_info_txt(int *cpt_fic, int *nbchar)
 {
 	struct dirent *dir;
-	// opendir() renvoie un pointeur de type DIR.
 	DIR *d = opendir("./txt");
 	if (d)
 	{
@@ -303,4 +266,30 @@ void visualize_file(const char *filename)
 
 	fclose(ptr);
 	puts(" ");
+}
+
+void simulation()
+{
+	printf("Generation n : 0\n");
+	print_world();
+
+	for (int n = 0; n < NUM_GENERATIONS; n++)
+	{
+		#ifndef DEBUG
+			system("tput clear");
+		#endif
+		
+		printf("Generation n : %d\n", n + 1);
+		next_generation();
+		print_world();
+		usleep(300000);
+
+		if (is_World_Empty())
+			n = NUM_GENERATIONS;
+	}
+
+	/* DONE: output final world state to console and save
+	   world to file "Final.txt" in current directory */
+
+	save_world_to_file("./txt/Final.txt");
 }
